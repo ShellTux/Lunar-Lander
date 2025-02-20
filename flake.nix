@@ -6,7 +6,7 @@
   outputs = { self, nixpkgs }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f rec {
+      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
         pkgs = import nixpkgs { inherit system; };
       });
     in
@@ -14,10 +14,16 @@
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           venvDir = ".venv";
-          packages = [ pkgs.python313 ] ++
-            (with pkgs.python313Packages; [
+          packages = [ pkgs.python312 ] ++
+            (with pkgs.python312Packages; [
+              gymnasium
+              numpy
               pip
+              pygame
               venvShellHook
+            ]) ++
+            (with pkgs; [
+              swig
             ]);
         };
       });
