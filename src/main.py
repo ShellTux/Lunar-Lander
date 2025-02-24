@@ -1,3 +1,4 @@
+from typing import Callable
 import argparse
 import gymnasium as gym
 import numpy as np
@@ -54,7 +55,7 @@ env = gym.make(
 )
 
 
-def check_successful_landing(observation) -> bool:
+def check_successful_landing(observation: np.ndarray) -> bool:
     x = observation[0]
     vy = observation[3]
     theta = observation[4]
@@ -76,8 +77,14 @@ def check_successful_landing(observation) -> bool:
     print("⚠️ Aterragem falhada!")
     return False
 
-def simulate(steps: int = 1000, seed = None, policy = None) -> tuple[int, bool]:
+def simulate(
+    steps: int = 1000,
+    *,
+    seed: int | None = None,
+    policy: Callable[[np.ndarray], np.ndarray]
+) -> tuple[int, bool]:
     observ, _ = env.reset(seed=seed)
+    step = 0
     for step in range(steps):
         action = policy(observ)
 
@@ -89,42 +96,34 @@ def simulate(steps: int = 1000, seed = None, policy = None) -> tuple[int, bool]:
     success = check_successful_landing(observ)
     return step, success
 
+# Perceptions
+# TODO: Defina as suas perceções aqui
 
-# Define perceptions here
-def extract_perceptions(observation):
-    # Simply return the observation array (or you could extract specific features if needed)
-    return observation
-
-
-#Perceptions
-##TODO: Defina as suas perceções aqui
-
-#Actions
-##TODO: Defina as suas ações aqui
+# Actions
+# TODO: Defina as suas ações aqui
 
 
-def reactive_agent(observation):
-    ##TODO: Implemente aqui o seu agente reativo
-    ##Substitua a linha abaixo pela sua implementação
+def reactive_agent(observation: np.ndarray) -> np.ndarray:
+    # TODO: Implemente aqui o seu agente reativo. Substitua a linha abaixo pela
+    # sua implementação
     action = env.action_space.sample()
     # action = keyboard_agent(observation)
     return action
 
 
-def keyboard_agent(observation):
-    action = [0,0]
+def keyboard_agent(observation: np.ndarray) -> np.ndarray:
     keys = pygame.key.get_pressed()
 
-    print('observação:', observation)
+    print(f'observação: {observation}')
 
     if keys[pygame.K_UP]:
-        action =+ np.array([1,0])
+        return np.array([1, 0])
     if keys[pygame.K_LEFT]:
-        action =+ np.array([0,-1])
+        return np.array([0, -1])
     if keys[pygame.K_RIGHT]:
-        action =+ np.array([0,1])
+        return np.array([0, 1])
 
-    return action
+    return np.ndarray([0, 0])
 
 
 
