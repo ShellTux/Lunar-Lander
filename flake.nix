@@ -21,10 +21,12 @@
               pip
               pygame
               venvShellHook
-            ]) ++
-            (with pkgs; [
-              swig
-            ]);
+            ]) ++ [
+              pkgs.gnumake
+              pkgs.pandoc
+              pkgs.swig
+              pkgs.texliveFull
+            ];
         };
       });
     };
