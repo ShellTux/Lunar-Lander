@@ -116,14 +116,15 @@ def keyboard_agent(observation: np.ndarray) -> np.ndarray:
 
     print(f'observação: {observation}')
 
+    action = np.array([0, 0])
     if keys[pygame.K_UP]:
-        return np.array([1, 0])
+        action = np.array([1, 0])
     if keys[pygame.K_LEFT]:
-        return np.array([0, -1])
+        action = np.array([0, -1])
     if keys[pygame.K_RIGHT]:
-        return np.array([0, 1])
+        action = np.array([0, 1])
 
-    return np.ndarray([0, 0])
+    return action
 
 
 
