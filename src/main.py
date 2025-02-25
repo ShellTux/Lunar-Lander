@@ -58,6 +58,56 @@ def simulate(steps=1000,seed=None, policy = None):
 
 #Actions
 ##TODO: Defina as suas ações aqui
+def get_actions(observation):
+    #0,5 < mot_p < 1
+    #-0,5 < mot_s dir (msd -> roda pr esq ) < -1 and 0,5 < mot_s esq (mse -> roda pr dir) < 1 
+    #obs0 = x, obs1 = y, obs2 = vx, obs3 = vy, obs4 = theta, obs5 = vel_ang, obs6 = contact_left, obs7 = contact_right
+    x = observation[0]
+    y = observation[1]
+    vx = observation[2]
+    vy = observation[3]
+    theta = observation[4]
+    vel_ang = observation[5]
+
+    action = [0,0] 
+
+    if abs(x) > 0.2: 
+        if x < -0.2:
+            if vx > 0.2:
+                pass
+            if np.deg2rad(-5) > theta > np.deg2rad(-15): 
+                action += np.array([0.6, 0.0])
+            elif theta < np.deg2rad(-15):
+                action += np.array([0.6, -0.6])
+            elif theta > np.deg2rad(-5):
+                action += np.array([0.6, 0.6])
+        elif x > 0.2:
+            if abs(vx) < -0.2:
+                pass
+            if np.deg2rad(5) <theta < np.deg2rad(15): 
+                action += np.array([0.6, 0.0])
+            elif theta > np.deg2rad(15):
+                action += np.array([0.6, 0.6])
+            elif theta < np.deg2rad(5):
+                action += np.array([0.6, -0.6])
+   
+    else: 
+        if abs(theta) > np.deg2rad(5):
+            if theta < 0:
+                action += np.array([0.0, -0.6])
+            elif theta > 0:
+                action += np.array([0.0, 0.6])
+            else:
+                pass 
+        if vy < -0.4:
+            action += np.array([0.6, 0.0])
+
+    if vy > 0: 
+        action += np.array([-1.0, 0.0])
+
+
+
+    return action
 
 
 def reactive_agent(observation):
