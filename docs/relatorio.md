@@ -3,6 +3,7 @@
 ---
 title: Relatório de Fundamentos de Inteligência Artificial
 subtitle: PL3
+lang: pt-PT
 author:
   - Alexandre Fonseca
   - David Carvalheiro
