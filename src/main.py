@@ -96,12 +96,6 @@ def simulate(
     success = check_successful_landing(observ)
     return step, success
 
-# Perceptions
-# TODO: Defina as suas perceções aqui
-
-# Actions
-# TODO: Defina as suas ações aqui
-
 def get_actions(observation: np.ndarray) -> np.ndarray:
     x, y, vx, vy, theta, vel_ang, _, _  = observation
 
