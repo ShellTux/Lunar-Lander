@@ -102,12 +102,50 @@ def simulate(
 # Actions
 # TODO: Defina as suas ações aqui
 
+def get_actions(observation: np.ndarray) -> np.ndarray:
+    x, y, vx, vy, theta, vel_ang, _, _  = observation
+
+    action = np.array([0, 0], dtype=np.float64)
+
+    if abs(x) > 0.2:
+        if x < -0.2:
+            if vx > 0.2:
+                pass
+            if np.deg2rad(-5) > theta > np.deg2rad(-15):
+                action += np.array([0.6, 0.0])
+            elif theta < np.deg2rad(-15):
+                action += np.array([0.6, -0.6])
+            elif theta > np.deg2rad(-5):
+                action += np.array([0.6, 0.6])
+        elif x > 0.2:
+            if abs(vx) < -0.2:
+                pass
+            if np.deg2rad(5) <theta < np.deg2rad(15):
+                action += np.array([0.6, 0.0])
+            elif theta > np.deg2rad(15):
+                action += np.array([0.6, 0.6])
+            elif theta < np.deg2rad(5):
+                action += np.array([0.6, -0.6])
+
+    else:
+        if abs(theta) > np.deg2rad(5):
+            if theta < 0:
+                action += np.array([0.0, -0.6])
+            elif theta > 0:
+                action += np.array([0.0, 0.6])
+        if vy < -0.4:
+            action += np.array([0.6, 0.0])
+
+    if vy > 0:
+        action += np.array([-1.0, 0.0])
+
+    return action
+
 
 def reactive_agent(observation: np.ndarray) -> np.ndarray:
     # TODO: Implemente aqui o seu agente reativo. Substitua a linha abaixo pela
     # sua implementação
-    action = env.action_space.sample()
-    # action = keyboard_agent(observation)
+    action = get_actions(observation)
     return action
 
 
