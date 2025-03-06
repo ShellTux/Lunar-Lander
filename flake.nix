@@ -24,6 +24,7 @@
             ]) ++ [
               pkgs.gnumake
               pkgs.pandoc
+              pkgs.pandoc-include
               pkgs.swig
               pkgs.texliveFull
             ];

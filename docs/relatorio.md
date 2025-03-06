@@ -39,14 +39,6 @@ Ações:
 
 Sistema de produções:
 
-- x > 0.2,  não inclinado, vel_ang suficiente, cair -> mp+        // não precisa de rodar mais
-- x > 0.2,  não inclinado, vx suficiente,      cair -> mp+        // já tem velocidade suf para chegar ao centro
-- x > 0.2,  não inclinado, cair                     -> msd-, mp+
-- x < -0.2, não inclinado, vel_ang suficiente, cair -> mp+        // não precisa de rodar mais
-- x < -0.2, não inclinado, vx suf,             cair -> mp+
-- x < -0.2, não inclinado, cair -> mse+,       mp+
-	//entre -0,2 e 0,2
-- theta < -ED  > msd-
-- theta >  ED -> mse+
-- vy < -0,2 -> mp+
-- vy > 0 -> mp-
+```python
+!include`snippetStart="def get_actions", snippetEnd="return action_np", includeSnippetDelimiters=True` src/main.py
+```
