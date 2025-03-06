@@ -99,42 +99,26 @@ def simulate(
 def get_actions(observation: np.ndarray) -> np.ndarray:
     x, y, vx, vy, theta, vel_ang, _, _  = observation
 
-    action = np.array([0, 0], dtype=np.float64)
+    theta_deg = np.rad2deg(theta)
 
-    if abs(x) > 0.2:
-        if x < -0.2:
-            if vx > 0.2:
-                pass
-            if np.deg2rad(-5) > theta > np.deg2rad(-15):
-                action += np.array([0.6, 0.0])
-            elif theta < np.deg2rad(-15):
-                action += np.array([0.6, -0.6])
-            elif theta > np.deg2rad(-5):
-                action += np.array([0.6, 0.6])
-        elif x > 0.2:
-            if abs(vx) < -0.2:
-                pass
-            if np.deg2rad(5) <theta < np.deg2rad(15):
-                action += np.array([0.6, 0.0])
-            elif theta > np.deg2rad(15):
-                action += np.array([0.6, 0.6])
-            elif theta < np.deg2rad(5):
-                action += np.array([0.6, -0.6])
+    action: tuple[float, float] = (0, 0)
 
-    else:
-        if abs(theta) > np.deg2rad(5):
-            if theta < 0:
-                action += np.array([0.0, -0.6])
-            elif theta > 0:
-                action += np.array([0.0, 0.6])
-        if vy < -0.4:
-            action += np.array([0.6, 0.0])
+    if                                             0 < vy       : action = (-1,   0)
+    elif      x < -.2 and -5 > theta_deg > -15                  : action = (.6,   0)
+    elif      x < -.2 and      theta_deg < -15                  : action = (.6, -.6)
+    elif      x < -.2 and -5 < theta_deg                        : action = (.6,  .6)
+    elif .2 < x       and  5 < theta_deg <  15                  : action = (.6,   0)
+    elif .2 < x       and 15 < theta_deg                        : action = (.6,  .6)
+    elif .2 < x       and      theta_deg <   5                  : action = (.6, -.6)
+    elif abs(x) < .2  and      theta_deg <  -5 and     vy <= -.5: action = (.6, -.6)
+    elif abs(x) < .2  and  5 < theta_deg       and     vy <= -.5: action = (.6,  .6)
+    elif abs(x) < .2  and      theta_deg <  -5                  : action = ( 0, -.6)
+    elif abs(x) < .2  and  5 < theta_deg                        : action = ( 0,  .6)
+    elif abs(x) < .2                           and     vy <  -.4: action = (.6,   0)
 
-    if vy > 0:
-        action += np.array([-1.0, 0.0])
+    action_np = np.array(action, dtype=np.float64)
 
-    return action
-
+    return action_np
 
 def reactive_agent(observation: np.ndarray) -> np.ndarray:
     # TODO: Implemente aqui o seu agente reativo. Substitua a linha abaixo pela
