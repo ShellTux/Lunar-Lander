@@ -3,18 +3,21 @@ import argparse
 import gymnasium as gym
 import numpy as np
 import pygame
+import random
 
 parser = argparse.ArgumentParser(description='Lunar Lander')
 parser.add_argument(
     '--render',
     choices=['none', 'human'],
-    default='human',
+    default='none',
     help="Set the render option to 'none' or 'human'."
 )
 parser.add_argument(
     '--episodes',
     type=int,
-    default=1000,
+    # generation: 100
+    # base: 1000
+    default=100,
     help="Set the number of episodes."
 )
 parser.add_argument(
@@ -40,6 +43,19 @@ parser.add_argument(
     type=bool,
     default=False,
     help="Enable the wind."
+)
+parser.add_argument(
+    '--generations',
+    type=int,
+    # base: 30
+    default=30,
+    help="The number of generations"
+)
+parser.add_argument(
+    '--specimen',
+    type=int,
+    default=10,
+    help="The number of specimen"
 )
 
 args = parser.parse_args()
@@ -81,12 +97,13 @@ def simulate(
     steps: int = 1000,
     *,
     seed: int | None = None,
-    policy: Callable[[np.ndarray], np.ndarray]
+    policy: Callable[[np.ndarray], np.ndarray],
+    current_specimen: np.array
 ) -> tuple[int, bool]:
     observ, _ = env.reset(seed=seed)
     step = 0
     for step in range(steps):
-        action = policy(observ)
+        action = policy(observ, current_specimen)
 
         observ, _, term, trunc, _ = env.step(action)
 
@@ -96,34 +113,40 @@ def simulate(
     success = check_successful_landing(observ)
     return step, success
 
-def get_actions(observation: np.ndarray) -> np.ndarray:
+def get_actions(
+        observation: np.ndarray,
+        current_specimen: np.array
+    ) -> np.ndarray:
     x, y, vx, vy, theta, vel_ang, _, _  = observation
 
     theta_deg = np.rad2deg(theta)
 
     action: tuple[float, float] = (0, 0)
 
-    if                                             0 < vy       : action = (-1,   0)
-    elif      x < -.2 and -5 > theta_deg > -15                  : action = (.6,   0)
-    elif      x < -.2 and      theta_deg < -15                  : action = (.6, -.6)
-    elif      x < -.2 and -5 < theta_deg                        : action = (.6,  .6)
-    elif .2 < x       and  5 < theta_deg <  15                  : action = (.6,   0)
-    elif .2 < x       and 15 < theta_deg                        : action = (.6,  .6)
-    elif .2 < x       and      theta_deg <   5                  : action = (.6, -.6)
-    elif abs(x) < .2  and      theta_deg <  -5 and     vy <= -.5: action = (.6, -.6)
-    elif abs(x) < .2  and  5 < theta_deg       and     vy <= -.5: action = (.6,  .6)
-    elif abs(x) < .2  and      theta_deg <  -5                  : action = ( 0, -.6)
-    elif abs(x) < .2  and  5 < theta_deg                        : action = ( 0,  .6)
-    elif abs(x) < .2                           and     vy <  -.4: action = (.6,   0)
+    if                                                                                 0 < vy                          : action = (-1,   0)
+    elif      x < -.2 and -current_specimen[1] > theta_deg > -current_specimen[0]                                      : action = (.6,   0)
+    elif      x < -.2 and                        theta_deg < -current_specimen[0]                                      : action = (.6, -.6)
+    elif      x < -.2 and -current_specimen[1] < theta_deg                                                             : action = (.6,  .6)
+    elif .2 < x       and  current_specimen[1] < theta_deg <  current_specimen[0]                                      : action = (.6,   0)
+    elif .2 < x       and  current_specimen[0] < theta_deg                                                             : action = (.6,  .6)
+    elif .2 < x       and                        theta_deg <   current_specimen[1]                                     : action = (.6, -.6)
+    elif abs(x) < .2  and                        theta_deg <  -current_specimen[2]  and    vy <= -.5                   : action = (.6, -.6)
+    elif abs(x) < .2  and  current_specimen[2] < theta_deg                          and    vy <= -.5                   : action = (.6,  .6)
+    elif abs(x) < .2  and                        theta_deg <  -current_specimen[2]                                     : action = ( 0, -.6)
+    elif abs(x) < .2  and  current_specimen[2] < theta_deg                                                             : action = ( 0,  .6)
+    elif abs(x) < .2                                                                and    vy <  -current_specimen[3]  : action = (.6,   0)
 
     action_np = np.array(action, dtype=np.float64)
 
     return action_np
 
-def reactive_agent(observation: np.ndarray) -> np.ndarray:
+def reactive_agent(
+        observation: np.ndarray,
+        current_specimen: np.array
+    ) -> np.ndarray:
     # TODO: Implemente aqui o seu agente reativo. Substitua a linha abaixo pela
     # sua implementação
-    action = get_actions(observation)
+    action = get_actions(observation, current_specimen)
     return action
 
 
@@ -145,10 +168,64 @@ def keyboard_agent(observation: np.ndarray) -> np.ndarray:
 
 
 def main():
+    # Sets up variables
+    current_generations = np.zeros((args.specimen, 4))
+    generation_best = np.zeros((3))
+    generation_best_atributes = np.zeros((3, 4))
+    generation_best_ind = np.zeros((3), dtype = np.uint16)
+    max_success_rate = 0
+    max_success_atributes = np.zeros((4))
+    # Creates random starting atributes
+    for i in range(args.specimen):
+        random_traits = [(random.random()*20 + 5), 
+                         (random.random()*10 + 1), 
+                         (random.random()*5 + 1), 
+                         (random.random()*0.5 - 1)]
+        current_generations[i,:] = np.array(random_traits)
+    # Starts testing for each generation
+    for gen in range(args.generations):
+        for spec in range(args.specimen):
+            result = run_case_test(current_generations[spec,:])
+            print('### Gen:', gen, 'spec: ', spec, 'Taxa de sucesso:', result, '###')
+            # if one of the new resulsts is better than the lowest, add it to the best's cases
+            if (generation_best.min() < result):
+                replaced = generation_best.argmin()
+                generation_best_ind[replaced] = spec
+                generation_best_atributes[replaced, :] = current_generations[spec,:]
+                generation_best[replaced] = result
+        # if the best case is inferior to one of the new generations, said generation becomes the new best
+        if max_success_rate < generation_best.max():
+            new_best = generation_best.argmax()
+            # new_best_ind = generation_best_ind[new_best]
+            # print(new_best_ind)
+            max_success_atributes = current_generations[generation_best_ind[new_best], :]
+            max_success_rate = generation_best[new_best]
+        # ignore if it is the final generation
+        if gen+1 >= args.generations:
+            # mutate from the top 3 best specimens
+            for passed_gen in range(3):
+                for created_gen in range(3):
+                    current_generations[created_gen+passed_gen*3, :] = np.array(
+                        [generation_best_atributes[passed_gen, 0]+(random.random()-0.5), 
+                         generation_best_atributes[passed_gen, 1]+(random.random()*0.5-0.25), 
+                         generation_best_atributes[passed_gen, 2]+(random.random()*0.3-0.15), 
+                         generation_best_atributes[passed_gen, 3]+(random.random()*0.05-0.025)])
+            # get the average of the best 3
+            current_generations[9, :] = np.array([
+                np.mean(generation_best_atributes[:, 0]),
+                np.mean(generation_best_atributes[:, 1]),
+                np.mean(generation_best_atributes[:, 2]),
+                np.mean(generation_best_atributes[:, 3])])
+    print("Best success rate: ", max_success_rate)
+    print("Best atributes: ", max_success_atributes)
+
+# Best success rate:  71.0
+# Best atributes:  [12.46023309  5.11224804  2.08336665 -0.64761862]
+def run_case_test(current_specimen: np.array):
     success = 0.0
     steps = 0.0
     for i in range(args.episodes):
-        st, su = simulate(steps=1000000, policy=reactive_agent)
+        st, su = simulate(steps=1000000, policy=reactive_agent, current_specimen=current_specimen)
         if su:
             steps += st
         success += su
@@ -156,6 +233,7 @@ def main():
         if su > 0:
             print('Média de passos das aterragens bem sucedidas:', steps/(su*(i+1))*100)
         print('Taxa de sucesso:', success/(i+1)*100)
+    return success/(args.episodes)*100
 
 if __name__ == '__main__':
     main()
