@@ -41,7 +41,7 @@ parser.add_argument(
 parser.add_argument(
     '--wind',
     type=bool,
-    default=False,
+    default=True,
     help="Enable the wind."
 )
 parser.add_argument(
@@ -173,11 +173,12 @@ def main():
     generation_best = np.zeros((3))
     generation_best_atributes = np.zeros((3, 4))
     generation_best_ind = np.zeros((3), dtype = np.uint16)
+    results = np.zeros((args.specimen))
     max_success_rate = 0
     max_success_atributes = np.zeros((4))
     # Creates random starting atributes
     for i in range(args.specimen):
-        random_traits = [(random.random()*20 + 5), 
+        random_traits = [(random.random()*10 + 10), 
                          (random.random()*10 + 1), 
                          (random.random()*5 + 1), 
                          (random.random()*0.5 - 1)]
@@ -185,14 +186,14 @@ def main():
     # Starts testing for each generation
     for gen in range(args.generations):
         for spec in range(args.specimen):
-            result = run_case_test(current_generations[spec,:])
-            print('### Gen:', gen, 'spec: ', spec, 'Taxa de sucesso:', result, '###')
+            results[spec] = run_case_test(current_generations[spec,:])
+            print('### Gen:', gen, 'spec: ', spec, 'Taxa de sucesso:', results[spec], '###')
             # if one of the new resulsts is better than the lowest, add it to the best's cases
-            if (generation_best.min() < result):
+            if (generation_best.min() < results[spec]):
                 replaced = generation_best.argmin()
                 generation_best_ind[replaced] = spec
                 generation_best_atributes[replaced, :] = current_generations[spec,:]
-                generation_best[replaced] = result
+                generation_best[replaced] = results[spec]
         # if the best case is inferior to one of the new generations, said generation becomes the new best
         if max_success_rate < generation_best.max():
             new_best = generation_best.argmax()
@@ -206,10 +207,10 @@ def main():
             for passed_gen in range(3):
                 for created_gen in range(3):
                     current_generations[created_gen+passed_gen*3, :] = np.array(
-                        [generation_best_atributes[passed_gen, 0]+(random.random()-0.5), 
-                         generation_best_atributes[passed_gen, 1]+(random.random()*0.5-0.25), 
-                         generation_best_atributes[passed_gen, 2]+(random.random()*0.3-0.15), 
-                         generation_best_atributes[passed_gen, 3]+(random.random()*0.05-0.025)])
+                        [generation_best_atributes[passed_gen, 0]+(random.random()-0.5)*results[passed_gen], 
+                         generation_best_atributes[passed_gen, 1]+(random.random()*0.5-0.25)*results[passed_gen], 
+                         generation_best_atributes[passed_gen, 2]+(random.random()*0.3-0.15)*results[passed_gen], 
+                         generation_best_atributes[passed_gen, 3]+(random.random()*0.05-0.025)*results[passed_gen]])
             # get the average of the best 3
             current_generations[9, :] = np.array([
                 np.mean(generation_best_atributes[:, 0]),
@@ -219,8 +220,7 @@ def main():
     print("Best success rate: ", max_success_rate)
     print("Best atributes: ", max_success_atributes)
 
-# Best success rate:  71.0
-# Best atributes:  [12.46023309  5.11224804  2.08336665 -0.64761862]
+
 def run_case_test(current_specimen: np.array):
     success = 0.0
     steps = 0.0

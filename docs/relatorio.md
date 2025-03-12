@@ -42,3 +42,9 @@ Sistema de produções:
 ```python
 !include`snippetStart="def get_actions", snippetEnd="return action_np", includeSnippetDelimiters=True` src/main.py
 ```
+
+### Sistema de Gerações:
+
+Para obter o melhor valor possivel para o nosso sistema de produções, nós decidimos criar um sistema que conseguisse gerar esses valores automaticamente, e com uma elevada taxa de sucesso.
+Inicialmente, considerámos um sistema que testava varias combinações de valores pré-defenidos, porem, este sistema demonstrava-se demasiado restristivo, ou demasiado pesado e demorado, estes motivos levaram-nos a criar um sistema que, gera 10 conjuntos valores iniciais aleatórios, e testa as taxas de sucessos dos mesmos, com estes valores, os 3 mais bem sucedidos são selecionados e a partir destes, são criados 3 novos valores com ligeiras mutações, estas mutações iram depender da taxa de sucesso do respetivos valores, e o 10 elemento é gerado a partir da média dos 3 valores obtidos, esta nova geração é por sua vez testada, e o processo repete-se no total de 30 gerações.
+Durante as 30 gerações, os valores também são verificados, para ver qual destes teve a melhor taxa de sucesso, que será indicada no final
