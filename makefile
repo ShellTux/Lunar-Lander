@@ -14,4 +14,4 @@ archive: $(ARCHIVE)
 
 $(ARCHIVE): $(REPORT) $(PYTHON_SCRIPTS)
 	rm --force $@
-	@echo $^ | xargs --max-args=1 | zip -@ $@
+	zip $@ $^
