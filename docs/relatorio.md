@@ -42,3 +42,21 @@ Sistema de produções:
 ```python
 !include`snippetStart="def get_actions", snippetEnd="return action_np", includeSnippetDelimiters=True` src/main.py
 ```
+
+## Resultados
+
+Resultados obtidos para 1000 episódios:
+
+- sem vento: ~73%
+- com vento: ~43%
+
+## Conclusão
+
+O sistema desenvolvido demonstrou a eficácia dos agentes reativos baseados em
+regras para a aterragem lunar, alcançando uma taxa de sucesso de ~73% sem vento
+e ~43% com vento. A otimização através de gerações permitiu a melhoria
+progressiva das regras de decisão, garantindo um desempenho sólido em condições
+ideais. No entanto, a abordagem puramente reativa tem limitações, especialmente
+em ambientes dinâmicos. O uso de memória poderia tornar o agente mais robusto,
+permitindo-lhe armazenar e utilizar informações passadas para melhorar a tomada
+de decisão.
