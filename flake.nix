@@ -27,6 +27,8 @@
               pkgs.pandoc-include
               pkgs.swig
               pkgs.texliveFull
+              pkgs.unzip
+              pkgs.zip
             ];
         };
       });
