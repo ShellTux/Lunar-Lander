@@ -37,7 +37,11 @@ Ações:
 
 ### Modelação do comportamento da nave através de um sistema de produções.
 
-Sistema de produções:
+Com base nas perceções e ações defenidas, podemos começar com a criação de uma base a partir da qual desenvolvemos o nosso sistema de produções.
+Para começar, queremos que a nave se localize sobre a zona de aterragem, logo, desejamos que se este estiver fora dessa região, que esteja em direção à mesma, para isso podemos ativar um dos motores secundários de forma a que este esteja suficientemente inclinado para que o motor principal seja suficiente para levar a nave para dentro da area referida anteriormente, porem, não queremos que esteja demasiado inclinada para a mesma, caso contrário, arriscamos que esta perca controlo e não consiga aterrar com as pernas, por isso, caso esta fique demasiado inclinada, devemos ativar o motor secundário para inverter a rotação de forma a que volte a estar mais inclinada.
+Agora que estamos dentro da zona de aterragem, devemos certeficar que a nave está o mais direita possivel para a aterragem, usando os motores secundarios para a manter relativamente direita, também desejamos que a aterragem em si não seja demasiado brusca, logo se a queda for demasiado alta, ativamos o motor principal, para controlar a velocidade de queda.
+Por ultimo, mas não menos importante, a nave deve mover-se de forma descendente o tempo todo.
+Com as bases do sistema criadas, o sistema de produções final deverá ter o seguinte aspeto:
 
 ```python
 !include`snippetStart="def get_actions", snippetEnd="return action_np", includeSnippetDelimiters=True` src/main.py
