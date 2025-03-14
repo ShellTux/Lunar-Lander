@@ -1,4 +1,4 @@
-ARCHIVE = FIA-AlexandreFonseca-DavidCarvalheiro-LuísGóis.zip
+ARCHIVE = FIA-PL3-AlexandreFonseca-DavidCarvalheiro-LuísGóis.zip
 REPORT  = docs/relatorio.pdf
 
 PANDOC_OPTS += --resource-path=docs
