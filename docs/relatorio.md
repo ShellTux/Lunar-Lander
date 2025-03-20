@@ -1,15 +1,16 @@
-# Fundamentos de Inteligência Artificial
-
 ---
 title: Relatório de Fundamentos de Inteligência Artificial
 subtitle: PL3
 lang: pt-PT
+toc: true
 author:
   - Alexandre Fonseca, nº 2022223121, uc2022223121@student.uc.pt
   - David Carvalheiro, nº 2022220112, uc2022220112@student.uc.pt
-  - Luís Pedro de Sousa Oliveira Góis, nº 2018280716, uc2018280716@student.uc.pt
+  - Luís Góis,         nº 2018280716, uc2018280716@student.uc.pt
 date: \today
 ---
+
+# Lunar Lander
 
 ## Modelação e desenvolvimento do Sistema de Produções
 
