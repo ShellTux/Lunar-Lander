@@ -4,5 +4,6 @@ Farama-Notifications==0.0.4
 gymnasium==1.0.0
 numpy==2.2.2
 pygame==2.6.1
+pytest==8.3.5
 swig==4.3.0
 typing_extensions==4.12.2
