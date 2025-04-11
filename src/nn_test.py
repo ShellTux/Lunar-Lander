@@ -1,5 +1,5 @@
 import numpy as np
-from ne import NeuralNetwork
+from nn import NeuralNetwork
 
 def test_network_shape():
     """Test the shape of the NeuralNetwork weights and biases."""
