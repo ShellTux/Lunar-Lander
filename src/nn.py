@@ -1,6 +1,4 @@
 import numpy as np
-import gymnasium as gym
-from args import args
 
 class NeuralNetwork:
     shape: list[int]
@@ -14,7 +12,7 @@ class NeuralNetwork:
 
         self.shape = list(sizes)
         self.weights = [
-            np.random.uniform(-1, 1, size=(layer_size, next_layer_size)).astype(np.float32)
+            np.zeros((layer_size, next_layer_size), dtype=np.float32)
             for layer_size, next_layer_size in zip(self.shape[:-1], self.shape[1:])
         ]
         self.biases = [
@@ -23,6 +21,16 @@ class NeuralNetwork:
         ]
 
         assert len(self.weights) == len(self.biases)
+
+    def __eq__(self, other):
+        if not isinstance(other, NeuralNetwork):
+            return False
+
+        return all([
+            self.shape == other.shape,
+            np.all(self.weights == other.weights),
+            np.all(self.biases == other.biases),
+        ])
 
     def __str__(self) -> str:
         """String representation of the network architecture."""
@@ -41,6 +49,21 @@ weights: [
 ]
 '''.strip()
 
+    @staticmethod
+    def random(*sizes: int):
+        nn = NeuralNetwork(*sizes)
+
+        nn.weights = [
+            np.random.uniform(-1, 1, size=(layer_size, next_layer_size)).astype(np.float32)
+            for layer_size, next_layer_size in zip(nn.shape[:-1], nn.shape[1:])
+        ]
+        nn.biases = [
+            np.zeros((1, layer_size)).astype(np.float32)
+            for layer_size in nn.shape[1:]
+        ]
+
+        return nn
+
     def set_parameters(self, weights: list[np.ndarray], biases: list[np.ndarray]) -> None:
         """Set weights and biases manually."""
         assert len(weights) == len(self.weights), "Number of weight matrices must match."
@@ -51,6 +74,14 @@ weights: [
 
         self.weights = weights
         self.biases = biases
+
+    def copy(self):
+        nn = NeuralNetwork(1,1,1)
+        nn.shape = self.shape
+        nn.weights = self.weights.copy()
+        nn.biases = self.biases.copy()
+
+        return nn
 
     def forward(self, X: np.ndarray) -> np.ndarray:
         """Forward pass through the network."""
@@ -116,36 +147,3 @@ weights: [
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Make predictions with the network."""
         return self.forward(X)
-
-def main():
-    agent = NeuralNetwork(8, 3, 3, 2)
-    print(agent)
-
-    env = gym.make(
-        "LunarLander-v3",
-        render_mode=args.render,
-        gravity=args.gravity,
-        continuous=True,
-        enable_wind=args.wind,
-        wind_power=args.wind_power,
-        turbulence_power=args.turbulence_power
-    )
-
-    observation, _ = env.reset()
-
-    while True:
-        action = agent.forward(observation)
-        # action = np.random.uniform(-1, 1, size=(2,)).astype(np.float32).clip(-1, 1).round(decimals=2)
-        print(f'action={np.array2string(action, precision=2)}', end='\r')
-
-        observation, reward, terminated, truncated, info = env.step(action)
-        env.render()
-
-        if terminated or truncated:
-            break
-
-    print()
-    env.close()
-
-if __name__ == '__main__':
-    main()

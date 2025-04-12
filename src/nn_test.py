@@ -39,7 +39,7 @@ def test_forward_shape():
 
     output = nn.forward(X)
 
-        # Calculate expected output manually
+    # Calculate expected output manually
     layer1 = nn._sigmoid(X @ weights[0] + biases[0])  # Output from first layer
     layer2 = nn._sigmoid(layer1 @ weights[1] + biases[1])  # Output from second layer
     expected_output = nn._sigmoid(layer2 @ weights[2] + biases[2])  # Output from third layer
@@ -51,3 +51,9 @@ def test_forward_shape():
     assert output.shape == (1,), "Output shape should be (1,)."
     np.testing.assert_almost_equal(output, expected_output.flatten(), decimal=5,
                                    err_msg="Output should match expected output.")
+
+def test_eq():
+    a = NeuralNetwork(2, 3, 4)
+    b = a.copy()
+
+    assert a == b
