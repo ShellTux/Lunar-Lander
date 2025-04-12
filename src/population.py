@@ -1,68 +1,14 @@
-import random
-from nn import NeuralNetwork
-from args import args
+from args import RenderMode, args
+from lander import Lander
+from matplotlib import pyplot as plt
 import gymnasium as gym
 import numpy as np
-import time
+import random
 
-class Lander:
-    nn: NeuralNetwork
-    fitness: float
-
-    def __init__(self) -> None:
-        # Initialize the neural network for the lander agent
-        self.nn = NeuralNetwork(8, 6, 6, 2)
-        self.fitness = 0  # Track the fitness score of the lander
-
-    def set_fitness(self, fitness: float) -> None:
-        """Set the fitness score of the lander."""
-        self.fitness = fitness
-
-    def run(
-        self,
-        *,
-        env: gym.Env,
-        debug: bool = False,
-        seed: int | None = None,
-    ) -> None:
-        observation, _ = env.reset(seed=seed)
-
-        total_reward: float = 0
-        time_survived: int = 0
-        penalties: float = 0
-
-        while True:
-            action = self.nn.forward(observation)
-            # action = np.random.uniform(-1, 1, size=(2,)).astype(np.float32).clip(-1, 1).round(decimals=2)
-            if debug:
-                print(f'action={np.array2string(action, precision=2)}', end='\r')
-
-            observation, reward, terminated, truncated, info = env.step(action)
-            if debug and len(info) > 0:
-                print(info)
-
-            env.render()
-
-            thrust_cost = np.sum(np.abs(action))
-            total_reward += reward
-            penalties += thrust_cost
-            time_survived += 1
-
-            if terminated or truncated:
-                break
-
-        if debug:
-            print()
-
-        distance_to_landing_pad = np.linalg.norm(observation[:2])
-        landing_score = 1 / (1 + distance_to_landing_pad)
-
-        fitness = total_reward + landing_score - penalties + time_survived
-
-        self.set_fitness(fitness)
 
 class Population:
     landers: list[Lander]
+    epochs: int
     generation: int
     elite_size: int
     seed: int | None
@@ -74,28 +20,26 @@ class Population:
         self,
         size: int,
         *,
-        generate_random_seed: bool = False
+        generate_random_seed: bool = False,
+        epochs: int = args.epochs,
     ) -> None:
         self.landers = [Lander() for _ in range(size)]
         self.generation = 1
         self.elite_size = 5
         self.seed = 12345 if not generate_random_seed else None
-        self.env = gym.make(
-            "LunarLander-v3",
-            render_mode=args.render,
-            continuous=True,
-            gravity=args.gravity,
-            enable_wind=args.wind,
-            wind_power=args.wind_power,
-            turbulence_power=args.turbulence_power
-        )
+        self.env = args.make_env()
+        self.epochs = epochs
         self.crossover_probability = args.crossover_probability
         self.mutation_probability = args.mutation_probability
 
     def __str__(self) -> str:
         return f'''
 Population:
-  size: {len(self.landers)}
+  size:       {len(self.landers)}
+  epochs:     {self.epochs}
+  elite size: {self.elite_size}
+  crossover:  {self.crossover_probability * 100}%
+  mutation:   {self.mutation_probability * 100}%
         '''.strip()
 
     def __enter__(self):
@@ -110,19 +54,20 @@ Population:
 
     def run(self) -> None:
         for lander in self.landers:
-            lander.run(env=self.env, seed=self.seed)
+            for _ in lander.run(env=self.env, seed=self.seed):
+                pass
 
         self.generation += 1
 
     def evolve(
         self,
-        generations: int,
+        generations: int | None = None,
         *,
         debug: bool = False,
     ):
-        for _ in range(generations):
+        for generation in range(1, (generations or self.epochs) + 1):
             if debug:
-                print(f'{self.generation=}')
+                print(f'{generation=}')
             self.run()
 
             self.landers.sort(key=lambda lander: lander.fitness, reverse=True)
@@ -151,15 +96,6 @@ Population:
 
         return child
 
-    def mutate(self, lander: Lander):
-        """Mutate the weights of the Lander with a certain mutation rate."""
-        for i in range(len(lander.nn.weights)):
-            if np.random.rand() > self.mutation_probability:
-                continue
-
-            mutation_amount: np.ndarray = np.random.normal(0, .1, size=lander.nn.weights[i].shape)
-            lander.nn.weights[i] = (lander.nn.weights[i] + mutation_amount).clip(-1, 1)
-
     def reproduce(self):
         """Create a new generation of landers from the elite."""
         elite_landers = self.select_elite()
@@ -169,44 +105,53 @@ Population:
             # TODO: Pick random 2 elite landers
             parent1, parent2 = random.sample(elite_landers, 2)
             child = self.crossover(parent1, parent2)
-            self.mutate(child)
+            child.mutate(self.mutation_probability)
             new_landers.append(child)
 
         self.landers = new_landers
 
 
 def main():
-    with Population(50) as population:
+    with Population(200, epochs=args.epochs) as population:
         print(population)
 
-        for fitness_array in population.evolve(100, debug=True):
-            print(f'Fitness values: {fitness_array[:5]}')
+        if args.evolve:
+            fitness_avgs = []
+
+            plt.ion()
+            plt.show()
+            plt.xlabel('Generation')
+            plt.ylabel('Fitness')
+            plt.title('Fitness Average vs Generation')
+
+            for fitness_array in population.evolve(debug=True):
+                fitness_avgs.append(fitness_array.mean())
+                print(f'Fitness values: {fitness_array[:5]}')
+
+                x = np.linspace(1, len(fitness_avgs), len(fitness_avgs), dtype=np.int32)
+
+                plt.xticks(x)
+                plt.plot(fitness_avgs)
+
+                plt.draw()
+                plt.pause(.1)
+
+            plt.ioff()
+            plt.show()
+
 
         best = population.select_elite()[0]
-        env = gym.make(
-            "LunarLander-v3",
-            render_mode='human',
-            continuous=True,
-            gravity=args.gravity,
-            enable_wind=args.wind,
-            wind_power=args.wind_power,
-            turbulence_power=args.turbulence_power
-        )
+        best.serialize('best.elite', append=True)
+        env = args.make_env(render_mode=RenderMode.RenderHuman)
 
-        observation, _ = env.reset()
+        for _ in range(5): # Number of runs
+            for action, _ in best.run(env=env, debug=True):
+                print(f'action={np.array2string(action, precision=2)}', end='\r')
+            else:
+                print()
 
-        while True:
-            action = best.nn.forward(observation)
-            print(f'action={np.array2string(action, precision=2)}', end='\r')
-
-            observation, _, terminated, truncated, _ = env.step(action)
-            env.render()
-
-            if terminated or truncated:
-                break
-
-        print()
         env.close()
+
 
 
 if __name__ == '__main__':
