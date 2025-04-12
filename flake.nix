@@ -91,6 +91,7 @@
               python.pkgs.pip
 
               python.pkgs.gymnasium
+              python.pkgs.matplotlib
               python.pkgs.numpy
               python.pkgs.pygame
               python.pkgs.pytest
