@@ -129,25 +129,28 @@ class Lander:
             if debug:
                 yield action, info
 
-        x, y, vx, vy, angle, ang_vel, _, _ = observation
+        x, y, vx, vy, angle, ang_vel, contact_left, contact_right = observation
 
-        values = np.array([
-            # weight, value
-            [1, total_reward],
+        legs_touching = contact_left == 1 and contact_right == 1
+        on_landing_pad = abs(x) <= 0.2
 
-            # Landing score
-            [20, 1 / 1 + (x ** 2 + y ** 2)],
-            [200, int(landed)],
-            [10, 1 / (1 + (vx**2 + vy**2))],
-            [-100, 1 / (1 + y)],
+        stable_velocity = vy > -0.2
+        stable_orientation = abs(angle) < np.deg2rad(20)
+        stable = stable_velocity and stable_orientation
 
-            [-1, penalties],
-            [1, time_survived]
-        ], dtype=np.float64)
+        success: bool = legs_touching and on_landing_pad and stable
 
-        fitness = float(values[:, 0] @ values[:, 1])
+        values = np.array([[key, value] for key, value in {
+            1000: 1 if success else -1,
+            200:  int(landed),
+            20:   1 / 1 + (x ** 2 + y ** 2),
+            10:   1 / (1 + (vx**2 + vy**2)),
+            1:    total_reward,
+            -1:   penalties,
+            -100: 1 / (1 + y),
+        }.items()])
 
-        self.set_fitness(fitness)
+        self.set_fitness(float(values[:, 0] @ values[:, 1]))
 
 def main():
     lander = Lander()
