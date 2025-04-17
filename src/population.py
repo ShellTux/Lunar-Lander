@@ -112,7 +112,7 @@ Population:
 
 
 def main():
-    with Population(200, epochs=args.epochs) as population:
+    with Population(args.population_size, epochs=args.epochs) as population:
         print(population)
 
         if args.evolve:

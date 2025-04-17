@@ -61,6 +61,12 @@ parser.add_argument(
     default=.1,
     help="Set the number of generations."
 )
+parser.add_argument(
+    '--population-size',
+    type=int,
+    default=200,
+    help="Set the initial population size."
+)
 
 class RenderMode(StrEnum):
     RenderNone = 'none'
@@ -78,6 +84,7 @@ class Args:
     epochs: int
     crossover_probability: float
     mutation_probability: float
+    population_size: int
 
     def __init__(self, args: argparse.Namespace) -> None:
         assert args.render_mode in RenderMode
@@ -91,6 +98,7 @@ class Args:
         assert 0 <= args.crossover_probability <= 1
         assert type(args.mutation_probability) == float
         assert 0 <= args.mutation_probability <= 1
+        assert type(args.population_size) == int
 
         self.render_mode = args.render_mode if args.render_mode != RenderMode.RenderNone else None
         self.episodes = args.episodes
@@ -102,6 +110,7 @@ class Args:
         self.epochs = self.generations = args.generations
         self.crossover_probability = args.crossover_probability
         self.mutation_probability = args.mutation_probability
+        self.population_size = args.population_size
 
     def make_env(
         self,
