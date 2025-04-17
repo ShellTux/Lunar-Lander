@@ -5,7 +5,6 @@ import gymnasium as gym
 import numpy as np
 import random
 
-
 class Population:
     landers: list[Lander]
     epochs: int
