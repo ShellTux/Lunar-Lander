@@ -4,15 +4,15 @@ import numpy as np
 import gymnasium as gym 
 import os
 import argparse
+import matplotlib.pyplot as plot
 from multiprocessing import Process, Queue
-
+import math 
 # CONFIG
 ENABLE_WIND = False
 WIND_POWER = 15.0
 TURBULENCE_POWER = 0.0
 GRAVITY = -10.0
-RENDER_MODE = 'human'
-EPISODES = 1000
+
 STEPS = 500
 
 NUM_PROCESSES = os.cpu_count()
@@ -27,18 +27,16 @@ GENOTYPE_SIZE = 0
 for i in range(1, len(SHAPE)):
     GENOTYPE_SIZE += SHAPE[i-1]*SHAPE[i]
 
-POPULATION_SIZE = 50
-NUMBER_OF_GENERATIONS = 10
 PROB_CROSSOVER = 0.7
 
   
-PROB_MUTATION = 1.0/GENOTYPE_SIZE
+PROB_MUTATION = 1.0/GENOTYPE_SIZE   #probability of mutation for each gene
 STD_DEV = 0.1
 
 
 ELITE_SIZE = 1
 
-TOURNAMENT_SIZE = 3
+TOURNAMENT_SIZE = 5
 
 parser = argparse.ArgumentParser(description='Lunar Lander')
 parser.add_argument(
@@ -50,9 +48,7 @@ parser.add_argument(
 parser.add_argument(
     '--episodes',
     type=int,
-    # generation: 100
-    # base: 1000
-    default=100,
+    default=1000,
     help="Set the number of episodes."
 )
 parser.add_argument(
@@ -76,14 +72,14 @@ parser.add_argument(
 parser.add_argument(
     '--wind',
     type=bool,
-    default=True,
+    default=False,
     help="Enable the wind."
 )
 parser.add_argument(
     '--generations',
     type=int,
     # base: 30
-    default=20,
+    default=50,
     help="The number of generations"
 )
 parser.add_argument(
@@ -92,9 +88,9 @@ parser.add_argument(
     default=50,
     help="The population size"
 )
-
 parser.add_argument(
     '--log',
+
     type=str,
     default='-1',
     help="The log file number, change the mod to load the bests"
@@ -173,31 +169,26 @@ def objective_function(observation):
     
     # Calculate individual components
     position_penalty = abs(x)  # Penalize being far from center
-    velocity_penalty = abs(vx) + abs(vy)  # Penalize high velocities
+    velocity_penalty_Y =  abs(vy)  # Penalize high velocities
+    velocity_penalty_X = abs(vx)  # Penalize high horizontal velocities
     angle_penalty = abs(theta)  # Penalize being tilted
     angular_vel_penalty = abs(omega)  # Penalize spinning
     
-    # Landing bonuses
-    leg_contact_bonus = 0
-    if contact_left or contact_right:
-        leg_contact_bonus = 0.5  # Partial bonus for one leg
-    if contact_left and contact_right:
-        leg_contact_bonus = 1.0  # Full bonus for both legs
-        
     success = check_successful_landing(observation)
-    landing_bonus = 10.0 if success else 0.0
-    
+    landing_bonus = 100.0 if success else 0.0
+    fitness = 100
     # Combine components with weights
-    fitness = (
-        -position_penalty * 0.5 + 
-        -velocity_penalty * 0.3 + 
-        -angle_penalty * 0.1 + 
-        -angular_vel_penalty * 0.1 + 
-        leg_contact_bonus * 0.5 + 
+    fitness += (
+        -position_penalty * 60 + 
+        -velocity_penalty_Y * 35 + 
+        -velocity_penalty_X * 20 + 
+        -angle_penalty * 15 + 
+        -angular_vel_penalty * 15 + 
         landing_bonus
     )
     
-    return fitness, success
+    return fitness , success
+
 
 def simulate(genotype, render_mode = None, seed=None, env = None):
     #Simulates an episode of Lunar Lander, evaluating an individual
@@ -269,13 +260,13 @@ def generate_initial_population():
 
 def tournament(gladiators , tournament_size=TOURNAMENT_SIZE):
     best = gladiators[0]
-    for i in range(2, tournament_size):
+    for i in range(1, tournament_size):
         next = gladiators[i]
         if next['fitness'] > best['fitness']:
             best = next
     return best
 
-def parent_selection(population, tournament_size=TOURNAMENT_SIZE, number_of_parents=2):
+def parent_selection_tournament(population, tournament_size=TOURNAMENT_SIZE, number_of_parents=2):
     if len(population) < number_of_parents:
         raise ValueError("Not enough individuals in the population to select parents.")
     elif number_of_parents == 1: 
@@ -287,43 +278,47 @@ def parent_selection(population, tournament_size=TOURNAMENT_SIZE, number_of_pare
         for i in range(number_of_parents): 
             gladiators = random.sample(population, tournament_size)
             selected.append(tournament(gladiators))
-            saved = population.pop(population.index(selected[i]))
-        population.append(saved)
+            #saved = population.pop(population.index(selected[i]))
+        #population.append(saved)
         return selected
 
+
+
 def crossover(p1, p2):
-    #TODO crossover com base no fitness -> p MAIS fit -> >% de genes 
-    # Perform single-point crossover
+    # Implement two-point crossover
     offspring = {'genotype': [], 'fitness': None}
-    crossover_point = random.randint(0, GENOTYPE_SIZE - 1)
+    point1 = random.randint(0, GENOTYPE_SIZE - 2)
+    point2 = random.randint(point1 + 1, GENOTYPE_SIZE - 1)
+    
+    # Create offspring genotype by combining segments from parents
     offspring['genotype'] = (
-        p1['genotype'][:crossover_point] + 
-        p2['genotype'][crossover_point:]
+        p1['genotype'][:point1] + 
+        p2['genotype'][point1:point2] + 
+        p1['genotype'][point2:]
     )
-    # add the fitness value based on the parents
-    offspring['fitness'] = (p1['fitness'] * crossover_point/GENOTYPE_SIZE + p2['fitness'] * 1 - crossover_point/GENOTYPE_SIZE) / 2
+    
+    # Calculate fitness as weighted average based on gene segments inherited
+    len_p1 = point1 + (GENOTYPE_SIZE - point2)
+    len_p2 = point2 - point1
+    offspring['fitness'] = (
+        (p1['fitness'] * len_p1 + p2['fitness'] * len_p2) / GENOTYPE_SIZE
+        if p1['fitness'] is not None and p2['fitness'] is not None else None
+    )
     
     return offspring
 
+
 def mutation(p):
     #TODO num_gens com, base no fitness-> atraves de uma função 
-    #Mutate the individual p
-    if np.random.rand() < PROB_MUTATION:
-        if (abs(p['fitness']) > 0.25):
-            # If the individual is not successful, apply a stronger mutation
-            mutations_points = random.sample(range(GENOTYPE_SIZE), 2)
-            mutation_values = np.random.normal(0, STD_DEV , size=2)
-            for i, mutation_point in enumerate(mutations_points):
-                p['genotype'][mutation_point] += mutation_values[i]
-                # Ensure the genotype values are within the range [-1, 1]
-                p['genotype'][mutation_point] = np.clip(p['genotype'][mutation_point], -1, 1)
-        else:
-            # If the individual is successful, apply a weaker mutation
-            mutation_point = random.randint(0, GENOTYPE_SIZE - 1)
+    #Mutate the individual 
+
+    for i in range(GENOTYPE_SIZE):
+        if np.random.rand() < PROB_MUTATION:
             mutation_value = np.random.normal(0, STD_DEV)
-            p['genotype'][mutation_point] += mutation_value
+            p['genotype'][i] += mutation_value
             # Ensure the genotype values are within the range [-1, 1]
-            p['genotype'][mutation_point] = np.clip(p['genotype'][mutation_point], -1, 1)
+            p['genotype'][i] = np.clip(p['genotype'][i], -1, 1)
+
 
     return p    
     
@@ -357,12 +352,11 @@ def evolution():
         #create offspring
         while len(offspring) < POPULATION_SIZE:
             if random.random() < PROB_CROSSOVER:
-                p1, p2 = parent_selection(population, number_of_parents=2)
+                p1, p2 = parent_selection_tournament(population, number_of_parents=2)
                 ni = crossover(p1, p2)
 
             else:
-                ni = parent_selection(population, number_of_parents=1)
-                
+                ni = parent_selection_tournament(population, number_of_parents=1)
             ni = mutation(ni)
             offspring.append(ni)
             
@@ -395,6 +389,23 @@ def load_bests(fname):
             bests.append(( eval(fitness),eval(shape), eval(genotype)))
     return bests
 
+def plot_evolution(all_fits, all_sucs):
+    # Convert boolean success values to integers for better visualization
+    all_sucs_int = [100 if s else 0 for s in all_sucs]
+    
+    # Plot both fitness and success values on the same plot
+    generations = list(range(len(all_fits)))
+    plot.figure(figsize=(10, 6))
+    plot.plot(generations, all_fits, marker='o', linestyle='-', label='Fitness')
+    plot.plot(generations, all_sucs_int, marker='x', linestyle='--', label='Success')
+    plot.title('Evolution of Fitness and Success Over Tests')
+    plot.xlabel('Test Number')
+    plot.ylabel('Value')
+    plot.legend()
+    plot.grid(True)
+    plot.savefig('evolution_plot_combined.png')
+    plot.show()
+
 if __name__ == '__main__':
     render_mode = RENDER_MODE
     log_num = args.log
@@ -424,11 +435,18 @@ if __name__ == '__main__':
         ind = {'genotype': ind, 'fitness': None}
             
         #ntests = 1000    
-        ntests = 100
+        ntests = 1000
 
         fit, success = 0, 0
+        all_fits, all_sucs = [], []
         for i in range(1,ntests+1):
             f, s = simulate(ind['genotype'], render_mode=render_mode, seed = None)
             fit += f
+            all_fits.append(f)
             success += s
+            all_sucs.append(s)
+
+        print(all_sucs.count(True))
+        plot_evolution(all_fits, all_sucs)
+        
         print(fit/ntests, success/ntests)
