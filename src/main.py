@@ -4,6 +4,7 @@ import numpy as np
 import gymnasium as gym 
 import os
 import argparse
+import matplotlib.pyplot as plot
 from multiprocessing import Process, Queue
 
 # CONFIG
@@ -126,6 +127,7 @@ if args.generations:
     NUMBER_OF_GENERATIONS = args.generations    
 if args.nb_files:
     NUMBER_OF_FILES = args.nb_files
+results = np.zeros(NUMBER_OF_FILES)
 # END OF CONFIG
 
 def network(shape, observation,ind):
@@ -335,7 +337,8 @@ def survival_selection(population, offspring):
     new_population.sort(key = lambda x: x['fitness'], reverse=True)
     return new_population    
         
-def evolution():
+def evolution(index):
+    best_generational_results = np.zeros(NUMBER_OF_GENERATIONS)
     #Create evaluation processes
     evaluation_processes = []
     for i in range(NUM_PROCESSES):
@@ -375,7 +378,10 @@ def evolution():
         #Print and save the best of the current generation
         best = (population[0]['genotype']), population[0]['fitness']
         bests.append(best)
+        best_generational_results[gen] = population[0]['fitness']
         print(f'Best of generation {gen}: {best[1]}')
+    plot.plot(best_generational_results)
+    plot.show()
 
     #Stop evaluation processes
     for i in range(NUM_PROCESSES):
@@ -384,6 +390,7 @@ def evolution():
         p.join()
         
     #Return the list of bests
+    results[index] = best[1]
     return bests
 
 def load_bests(fname):
@@ -408,10 +415,14 @@ if __name__ == '__main__':
         seeds = [964, 952, 364, 913, 140, 726, 112, 631, 881, 844, 965, 672, 335, 611, 457, 591, 551, 538, 673, 437, 513, 893, 709, 489, 788, 709, 751, 467, 596, 976]
         for i in range(NUMBER_OF_FILES):    
             random.seed(seeds[i])
-            bests = evolution()
+            bests = evolution(i)
             with open(f'log{i}.txt', 'w') as f:
                 for b in bests:
                     f.write(f'{b[1]}\t{SHAPE}\t{b[0]}\n')
+        
+        plot.plot(results)
+        plot.show()
+        print(results)
 
                 
     else:
@@ -431,4 +442,5 @@ if __name__ == '__main__':
             f, s = simulate(ind['genotype'], render_mode=render_mode, seed = None)
             fit += f
             success += s
+            
         print(fit/ntests, success/ntests)
