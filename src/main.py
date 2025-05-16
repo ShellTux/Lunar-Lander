@@ -177,16 +177,18 @@ def objective_function(observation):
     
     success = check_successful_landing(observation)
     landing_bonus = 100.0 if success else 0.0
-    fitness = 100
+    # fitness = 100
     # Combine components with weights
-    fitness += (
-        -position_penalty * 60 + 
-        -velocity_penalty_Y * 35 + 
-        -velocity_penalty_X * 20 + 
-        -angle_penalty * 15 + 
-        -angular_vel_penalty * 15 + 
-        landing_bonus
-    )
+    fitness = 100 - position_penalty*100
+    if (position_penalty < 0.2):
+        fitness += 100 - min(velocity_penalty_Y*20, 100)
+        if (velocity_penalty_Y < 0.2):
+            fitness += 100 - min(angle_penalty*5, 100)
+            # if (angle_penalty < 20):
+            #     if (contact_left):
+            #         fitness += 50
+            #     if (contact_right):
+            #         fitness += 50
     
     return fitness , success
 
