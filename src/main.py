@@ -50,7 +50,7 @@ parser.add_argument(
 parser.add_argument(
     '--episodes',
     type=int,
-    default=1000,
+    default=100,
     help="Set the number of episodes."
 )
 parser.add_argument(
@@ -419,7 +419,7 @@ if __name__ == '__main__':
     NUM_TESTS = 100
     NUMBER_OF_FILES = 5
     EXPERIMENTS = [
-        # (pc, pm, elite)
+        #(PROB_CROSSOVER, PROB_MUTATION, ELITE_SIZE)
         (0.5,  0.008, 0),
         (0.5,  0.050, 0),
         (0.9,  0.008, 0),
@@ -436,7 +436,6 @@ if __name__ == '__main__':
         evolve = 0
         #render_mode = 'human'
 
-    
     if evolve:
         seeds = [964, 952, 364, 913, 140, 726, 112, 631, 881, 844, 965, 672, 335, 611, 457, 591, 551, 538, 673, 437, 513, 893, 709, 489, 788, 709, 751, 467, 596, 976]
         for exp_idx, exp in enumerate(EXPERIMENTS):
