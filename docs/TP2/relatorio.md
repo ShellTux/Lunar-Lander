@@ -196,9 +196,9 @@ geralmente baixas, e os desvios padrão elevados indicam um comportamento
 imprevisível: algumas execuções registaram desempenhos notáveis, enquanto
 outras falharam por completo. Com a introdução de vento, o desempenho global
 deteriorou-se, como seria de esperar devido ao aumento da complexidade do
-ambiente. Ainda assim, a experiência 8 destacou-se em ambos os cenários,
-sugerindo que uma combinação de taxas elevadas de crossover e mutação aliadas
-ao elitismo favorece a obtenção de melhores resultados.
+ambiente. Ainda assim, a **experiência 8** destacou-se em ambos os cenários,
+sugerindo que uma combinação de **taxas elevadas de crossover e mutação aliadas
+ao elitismo** favorece a obtenção de melhores resultados.
 
 Melhorias futuras poderão incluir o aumento do tamanho da população, número de
 gerações e experiências, a refinação da função de fitness, e a reestruturação
@@ -208,10 +208,10 @@ Estes resultados refletem bem as propriedades típicas dos algoritmos genéticos
 são ferramentas poderosas para a exploração de soluções em espaços complexos,
 mas altamente sensíveis à configuração dos seus parâmetros. A ocorrência de
 soluções ótimas rodeadas por médias fracas evidencia o potencial do método, mas
-também reforça a necessidade de um maior controlo da diversidade populacional e
-dos operadores evolutivos, a fim de alcançar maior consistência e fiabilidade
-nos resultados, minimizando a dependência de fatores aleatórios.
+também reforça a necessidade de um **maior controlo da diversidade populacional
+e dos operadores evolutivos**, a fim de alcançar **maior consistência e
+fiabilidade** nos resultados, minimizando a dependência de fatores aleatórios.
 
-No geral, este projeto evidencia o potencial dos algoritmos genéticos como uma
-abordagem robusta e flexível para resolver problemas desafiantes de controlo,
-mesmo em ambientes dinâmicos e ruidosos como o do Lunar Lander.
+No geral, este projeto evidencia o **potencial dos algoritmos genéticos como
+uma abordagem robusta e flexível** para resolver problemas desafiantes de
+controlo, mesmo em ambientes dinâmicos e ruidosos como o do Lunar Lander.
