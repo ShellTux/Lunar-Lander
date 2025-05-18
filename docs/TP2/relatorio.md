@@ -197,3 +197,38 @@ fiabilidade** nos resultados, minimizando a dependência de fatores aleatórios.
 No geral, este projeto evidencia o **potencial dos algoritmos genéticos como
 uma abordagem robusta e flexível** para resolver problemas desafiantes de
 controlo, mesmo em ambientes dinâmicos e ruidosos como o do Lunar Lander.
+
+## Anexos
+
+![evolution_plot_exp1](docs/TP2/plots/no_wind/evolution_plot_exp1.png){width=50%}
+![run_plot_exp1](docs/TP2/plots/no_wind/run_plot_exp1.png){width=50%}
+![run_plot_exp3](docs/TP2/plots/no_wind/run_plot_exp3.png){width=50%}
+![run_plot_exp2](docs/TP2/plots/no_wind/run_plot_exp2.png){width=50%}
+![run_plot_exp4](docs/TP2/plots/no_wind/run_plot_exp4.png){width=50%}
+![run_plot_exp8](docs/TP2/plots/no_wind/run_plot_exp8.png){width=50%}
+![evolution_plot_exp7](docs/TP2/plots/no_wind/evolution_plot_exp7.png){width=50%}
+![run_plot_exp7](docs/TP2/plots/no_wind/run_plot_exp7.png){width=50%}
+![run_plot_exp5](docs/TP2/plots/no_wind/run_plot_exp5.png){width=50%}
+![evolution_plot_exp2](docs/TP2/plots/no_wind/evolution_plot_exp2.png){width=50%}
+![evolution_plot_exp4](docs/TP2/plots/no_wind/evolution_plot_exp4.png){width=50%}
+![evolution_plot_exp5](docs/TP2/plots/no_wind/evolution_plot_exp5.png){width=50%}
+![run_plot_exp6](docs/TP2/plots/no_wind/run_plot_exp6.png){width=50%}
+![evolution_plot_exp8](docs/TP2/plots/no_wind/evolution_plot_exp8.png){width=50%}
+![evolution_plot_exp6](docs/TP2/plots/no_wind/evolution_plot_exp6.png){width=50%}
+![evolution_plot_exp3](docs/TP2/plots/no_wind/evolution_plot_exp3.png){width=50%}
+![evolution_plot_wind_exp2](docs/TP2/plots/with_wind/evolution_plot_wind_exp2.png){width=50%}
+![evolution_plot_wind_exp6](docs/TP2/plots/with_wind/evolution_plot_wind_exp6.png){width=50%}
+![evolution_plot_wind_exp7](docs/TP2/plots/with_wind/evolution_plot_wind_exp7.png){width=50%}
+![evolution_plot_wind_exp4](docs/TP2/plots/with_wind/evolution_plot_wind_exp4.png){width=50%}
+![run_plot_wind_exp7](docs/TP2/plots/with_wind/run_plot_wind_exp7.png){width=50%}
+![run_plot_wind_exp3](docs/TP2/plots/with_wind/run_plot_wind_exp3.png){width=50%}
+![run_plot_wind_exp8](docs/TP2/plots/with_wind/run_plot_wind_exp8.png){width=50%}
+![run_plot_wind_exp6](docs/TP2/plots/with_wind/run_plot_wind_exp6.png){width=50%}
+![run_plot_wind_exp2](docs/TP2/plots/with_wind/run_plot_wind_exp2.png){width=50%}
+![run_plot_wind_exp4](docs/TP2/plots/with_wind/run_plot_wind_exp4.png){width=50%}
+![evolution_plot_wind_exp8](docs/TP2/plots/with_wind/evolution_plot_wind_exp8.png){width=50%}
+![evolution_plot_wind_exp3](docs/TP2/plots/with_wind/evolution_plot_wind_exp3.png){width=50%}
+![run_plot_wind_exp1](docs/TP2/plots/with_wind/run_plot_wind_exp1.png){width=50%}
+![run_plot_wind_exp5](docs/TP2/plots/with_wind/run_plot_wind_exp5.png){width=50%}
+![evolution_plot_wind_exp1](docs/TP2/plots/with_wind/evolution_plot_wind_exp1.png){width=50%}
+![evolution_plot_wind_exp5](docs/TP2/plots/with_wind/evolution_plot_wind_exp5.png){width=50%}
