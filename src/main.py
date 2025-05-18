@@ -74,7 +74,7 @@ parser.add_argument(
 parser.add_argument(
     '--wind',
     type=bool,
-    default=False,
+    default=True,
     help="Enable the wind."
 )
 parser.add_argument(
@@ -376,7 +376,7 @@ def evolution():
         best = (population[0]['genotype']), population[0]['fitness']
         bests.append(best)
     #     best_generational_results[gen] = population[0]['fitness']
-        print(f'Best of generation {gen}: {best[1]}')
+        # print(f'Best of generation {gen}: {best[1]}')
     # plot.title(f'Creation {index}')
     # plot.plot(best_generational_results)
     # plot.show()
@@ -430,6 +430,7 @@ if __name__ == '__main__':
         # (0.9,  0.050, 1),
     ]
     log_num = args.log
+    sucess = np.zeros(NUMBER_OF_FILES)
     if log_num == '-1':
         evolve = 1
     else: 
@@ -470,20 +471,24 @@ if __name__ == '__main__':
             plot.ylabel('Fitness')
             plot.legend(fontsize='small', ncol=2)
             plot.grid(True)
-            plot.savefig(f'evolution_plot_exp{exp_idx+1}.png')
+            plot.savefig(f'evolution_plot_wind_exp{exp_idx+1}.png')
             plot.close()
             # Plot success and fitness for each run
             plot.figure(figsize=(10, 6))
             num_tests = list(range(NUM_TESTS))
             for i in range(NUMBER_OF_FILES):
+                sucess[i] = all_run_sucs[i].count(400)/NUM_TESTS*100
+                # s_deviations[i] = np.std(all_run_sucs[i].count(400))
                 plot.plot(num_tests, all_run_fits[i], linestyle='-', alpha=0.5, label=f'Run nº{i+1} Fitness')
-                plot.plot(num_tests, all_run_sucs[i], marker='o', linestyle='', alpha=0.5, label=f'Run nº{i+1} Success({all_run_sucs[i].count(400)/NUM_TESTS*100:.2f}%)')
+                plot.plot(num_tests, all_run_sucs[i], marker='o', linestyle='', alpha=0.5, label=f'Run nº{i+1} Success({sucess[i]:.2f}%)')
+            print(np.mean(sucess))
+            print(np.std(sucess))
             plot.title(f'Run Fitness and Success (Exp {exp})')
             plot.xlabel('Num of tests')
             plot.ylabel('Sucess/Fitness')
             plot.legend(fontsize='small', ncol=2)
             plot.grid(True)
-            plot.savefig(f'run_plot_exp{exp_idx+1}.png')
+            plot.savefig(f'run_plot_wind_exp{exp_idx+1}.png')
             plot.close()
 
                 
