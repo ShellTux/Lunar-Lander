@@ -376,7 +376,7 @@ def evolution():
         best = (population[0]['genotype']), population[0]['fitness']
         bests.append(best)
     #     best_generational_results[gen] = population[0]['fitness']
-    #     print(f'Best of generation {gen}: {best[1]}')
+        print(f'Best of generation {gen}: {best[1]}')
     # plot.title(f'Creation {index}')
     # plot.plot(best_generational_results)
     # plot.show()
@@ -424,10 +424,10 @@ if __name__ == '__main__':
         (0.5,  0.050, 0),
         (0.9,  0.008, 0),
         (0.9,  0.050, 0),
-        (0.5,  0.008, 1),
-        (0.5,  0.050, 1),
-        (0.9,  0.008, 1),
-        (0.9,  0.050, 1),
+        # (0.5,  0.008, 1),
+        # (0.5,  0.050, 1),
+        # (0.9,  0.008, 1),
+        # (0.9,  0.050, 1),
     ]
     log_num = args.log
     if log_num == '-1':
