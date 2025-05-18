@@ -189,27 +189,29 @@ Table: Distribuição das Taxas de Sucesso com vento
 
 ## Conclusão
 
-Neste projeto, implementamos um algoritmo genético (GA) para resolver o
-problema `Lunar Lander`, demonstrando a eficácia dos métodos evolutivos nas
-tarefas de aprendizagem. Ao evoluir uma população de redes neurais por meio de
-seleção, crossover e mutação, a nossa abordagem melhorou gradualmente o
-desempenho da aterragem.
+Os resultados demonstram que o algoritmo genético foi capaz de encontrar
+soluções para o problema da aterragem bem-sucedida, mas de forma bastante
+instável. Mesmo na ausência de vento, as médias de sucesso revelaram-se
+geralmente baixas, e os desvios padrão elevados indicam um comportamento
+imprevisível: algumas execuções registaram desempenhos notáveis, enquanto
+outras falharam por completo. Com a introdução de vento, o desempenho global
+deteriorou-se, como seria de esperar devido ao aumento da complexidade do
+ambiente. Ainda assim, a experiência 8 destacou-se em ambos os cenários,
+sugerindo que uma combinação de taxas elevadas de crossover e mutação aliadas
+ao elitismo favorece a obtenção de melhores resultados.
 
-Os resultados destacam a adaptabilidade do GA na otimização de políticas de
-controle para ambientes complexos, mesmo com recompensas esparsas. Embora o
-algoritmo exigisse ajuste cuidadoso de hiperparâmetros, como tamanho da
-população, taxa de mutação e critérios de condicionamento físico, ele se
-mostrou capaz de alcançar aterragens estáveis.
+Melhorias futuras poderão incluir o aumento do tamanho da população, número de
+gerações e experiências, a refinação da função de fitness, e a reestruturação
+do sistema evolutivo e dos seus mecanismos de seleção e variação.
 
-O GA é mais adequado para problemas de otimização complexos, não diferenciáveis
-ou ruidosos, onde os métodos baseados em gradiente lutam, como ajustar
-hiperparâmetros, redes neurais em evolução ou resolver tarefas de controle com
-recompensas esparsas. Eles se destacam em explorar espaços de pesquisa de alta
-dimensão sem ficar presos no Optima local, tornando-os ideais para a otimização
-de caixas negras. No entanto, eles podem ser computacionalmente caros, por isso
-são mais práticos quando paralelizáveis ou quando gradientes exatos não estão
-disponíveis. Evite o GA para problemas simples, suaves ou convexos, onde
-existem métodos mais rápidos (por exemplo, SGD) e sabemos o erro.
+Estes resultados refletem bem as propriedades típicas dos algoritmos genéticos:
+são ferramentas poderosas para a exploração de soluções em espaços complexos,
+mas altamente sensíveis à configuração dos seus parâmetros. A ocorrência de
+soluções ótimas rodeadas por médias fracas evidencia o potencial do método, mas
+também reforça a necessidade de um maior controlo da diversidade populacional e
+dos operadores evolutivos, a fim de alcançar maior consistência e fiabilidade
+nos resultados, minimizando a dependência de fatores aleatórios.
 
-No geral, este projeto ressalta o potencial dos algoritmos genéticos como uma
-ferramenta versátil para resolver problemas desafiadores de controle.
+No geral, este projeto evidencia o potencial dos algoritmos genéticos como uma
+abordagem robusta e flexível para resolver problemas desafiantes de controlo,
+mesmo em ambientes dinâmicos e ruidosos como o do Lunar Lander.
