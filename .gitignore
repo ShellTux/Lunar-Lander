@@ -608,3 +608,8 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/python,vim,visualstudio,visualstudiocode
 
 .direnv
+*.pdf
+*.zip
+*.elite
+log*.txt
+*.lander
