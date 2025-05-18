@@ -611,3 +611,5 @@ FodyWeavers.xsd
 *.pdf
 *.zip
 *.elite
+log*.txt
+*.lander
