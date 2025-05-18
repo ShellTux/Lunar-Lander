@@ -16,21 +16,27 @@ Ficheiro: `src/main.py`
 
 ## Sistema Base
 
-Neste trabalho, desenvolvemos um sistema baseado em redes neuronais, integradas num ambiente evolutivo. Cada rede possui:
-8 parâmetros de entrada, correspondentes à observação do ambiente;
-12 neurónios em camadas escondidas;
-2 valores de saída, utilizados para controlar as ações da nave (como potência do motor principal e direção).
-Cada indivíduo da população evolutiva contém duas componentes principais:
-Genótipo: corresponde aos pesos da rede neuronal, representando o “ADN” do indivíduo;
-Fitness: valor numérico que reflete o desempenho da rede após simulação, calculado com base em critérios definidos (distância à base de aterragem, velocidade, estabilidade, etc.).
-O processo evolutivo decorre da seguinte forma:
+Neste trabalho, desenvolvemos um sistema baseado em redes neuronais, integradas num ambiente evolutivo.
 
-Inicialização da população com redes neuronais com pesos aleatórios;
-Avaliação de cada rede através de simulações no ambiente Lunar Lander;
-Seleção dos melhores indivíduos com base no fitness;
-Cruzamento (crossover) e mutação para gerar novos indivíduos (filhos);
-Substituição dos indivíduos antigos por novos;
+Cada rede possui:
+
+- 8 parâmetros de entrada, correspondentes à observação do ambiente;
+- 12 neurónios em camadas escondidas;
+- 2 valores de saída, utilizados para controlar as ações da nave.
+
+Cada indivíduo da população evolutiva contém duas componentes principais:
+
+- Genótipo: corresponde aos pesos da rede neuronal, representando o “ADN” do indivíduo;
+- Fitness: valor numérico que reflete o desempenho da rede após simulação, calculado com base em critérios definidos (distância à base de aterragem, velocidade, estabilidade, etc.).
+- O processo evolutivo decorre da seguinte forma:
+  - Inicialização da população com redes neuronais com pesos aleatórios;
+  - Avaliação de cada rede através de simulações no ambiente Lunar Lander;
+  - Seleção dos melhores indivíduos com base no fitness;
+  - Cruzamento (crossover) e mutação para gerar novos indivíduos (filhos);
+  - Substituição dos indivíduos antigos por novos;
+
 Repetição do processo por várias gerações.
+
 No final, o melhor indivíduo (aquele com maior fitness) é guardado num ficheiro para análise posterior ou reutilização.
 
 
@@ -143,14 +149,24 @@ incapazes de melhorar noutra área.
 
 ### Com Vento
 
-| Experiência | Crossover | Mutation | Elite Size | Média | Desvio Padrão |
-| ---         | ---       | ---      | ---        | ---   | ---           |
-| 1           | .5        | .008     | 0          | 4.4   | 2.42          |
-| 2           | .5        | .05      | 0          | 6.0   | 4.82          |
-| 3           | .9        | .008     | 0          | 10.6  | 8.11          |
-| 4           | .9        | .05      | 0          | 10.2  | 7.47          |
+| Experiência | Taxas de Sucesso(%) | Médias(%) | Desvios Padrão |
+| ---         | ---                 | ---       | ---            |
+| 1           | 5, 6, 4, 0, 7       | 4.4       | 2,42           |
+| 2           | 3, 1, 5, 6, 15      | 6.0       | 4, 82          |
+| 3           | 21, 2, 9, 2, 19     | 10.6      | 8.11           |
+| 4           | 5, 1, 12, 23, 10    | 10.2      | 7,46           |
+| 5           | 0, 1, 0, 5, 4       | 2.0       | 2,098          |
+| 6           | 0, 2, 0, 0, 6       | 1.6       | 2,332          |
+| 7           | 4, 2, 13, 2, 14     | 7.0       | 5,367          |
+| 8           | 54, 10, 14, 1, 82   | 32,2      | 30,831         |
 
 Table: Distribuição das Taxas de Sucesso com vento
+
+Similarmente à tabela 1, a tabela 2 demonstra ser incrivelmente erradica, tendo
+desvios padrões superiores à própria média, porém, esta contêm valores
+incrivelmente baixos, comparado com os itens da tabela 1 (exceto na experiência
+8, que contém valores que se aproximam aos melhores da tabela 1), o que seria
+de esperar, considerando o acréscimo de dificuldade que o vento propõe.
 
 
 ## Conclusão

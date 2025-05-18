@@ -270,7 +270,11 @@ def tournament(gladiators , tournament_size=TOURNAMENT_SIZE):
             best = next
     return best
 
-def parent_selection_tournament(population, tournament_size=TOURNAMENT_SIZE, number_of_parents=2):
+def parent_selection_tournament(
+        population,
+        tournament_size=TOURNAMENT_SIZE,
+        number_of_parents=2
+):
     if len(population) < number_of_parents:
         raise ValueError("Not enough individuals in the population to select parents.")
     elif number_of_parents == 1:
