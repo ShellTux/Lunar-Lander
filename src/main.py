@@ -335,7 +335,7 @@ def survival_selection(population, offspring):
     new_population.sort(key = lambda x: x['fitness'], reverse=True)
     return new_population    
         
-def evolution(index):
+def evolution():
     best_generational_results = np.zeros(NUMBER_OF_GENERATIONS)
     #Create evaluation processes
     evaluation_processes = []
@@ -375,11 +375,11 @@ def evolution(index):
         #Print and save the best of the current generation
         best = (population[0]['genotype']), population[0]['fitness']
         bests.append(best)
-        best_generational_results[gen] = population[0]['fitness']
-        print(f'Best of generation {gen}: {best[1]}')
-    plot.title(f'Creation {index}')
-    plot.plot(best_generational_results)
-    plot.show()
+    #     best_generational_results[gen] = population[0]['fitness']
+    #     print(f'Best of generation {gen}: {best[1]}')
+    # plot.title(f'Creation {index}')
+    # plot.plot(best_generational_results)
+    # plot.show()
 
     #Stop evaluation processes
     for i in range(NUM_PROCESSES):
@@ -387,8 +387,6 @@ def evolution(index):
     for p in evaluation_processes:
         p.join()
         
-    #Return the list of bests
-    results[index] = best[1]
     return bests
 
 def load_bests(fname):
@@ -418,79 +416,75 @@ def plot_evolution(all_fits, all_sucs):
     plot.show()
 
 if __name__ == '__main__':
-    # render_mode = RENDER_MODE
-    render_mode = 'human'
-    file_results = np.zeros(30)
-    # log_num = args.log
-    log_num = '3'
-    # if log_num == '-1':
-    #     evolve = 1
-    # else: 
-    #     evolve = 0
-    #     #render_mode = 'human'
-        
-    # # if evolve:
-    # seeds = [964, 952, 364, 913, 140, 726, 112, 631, 881, 844, 965, 672, 335, 611, 457, 591, 551, 538, 673, 437, 513, 893, 709, 489, 788, 709, 751, 467, 596, 976]
-    # for i in range(NUMBER_OF_FILES):    
-    #     random.seed(seeds[i])
-    #     bests = evolution(i)
-    #     with open(f'log{i}.txt', 'w') as f:
-    #         for b in bests:
-    #             f.write(f'{b[1]}\t{SHAPE}\t{b[0]}\n')
-    # plot.plot(results)
-    # plot.show()
-    # print(results)
+    NUM_TESTS = 100
+    NUMBER_OF_FILES = 5
+    EXPERIMENTS = [
+        # (pc, pm, elite)
+        (0.5,  0.008, 0),
+        (0.5,  0.050, 0),
+        (0.9,  0.008, 0),
+        (0.9,  0.050, 0),
+        (0.5,  0.008, 1),
+        (0.5,  0.050, 1),
+        (0.9,  0.008, 1),
+        (0.9,  0.050, 1),
+    ]
+    log_num = args.log
+    if log_num == '-1':
+        evolve = 1
+    else: 
+        evolve = 0
+        #render_mode = 'human'
+
+    
+    if evolve:
+        seeds = [964, 952, 364, 913, 140, 726, 112, 631, 881, 844, 965, 672, 335, 611, 457, 591, 551, 538, 673, 437, 513, 893, 709, 489, 788, 709, 751, 467, 596, 976]
+        for exp_idx, exp in enumerate(EXPERIMENTS):
+            PROB_CROSSOVER, PROB_MUTATION, ELITE_SIZE = exp
+            print(f'Experiment {exp_idx + 1}: Crossover: {PROB_CROSSOVER}, Mutation: {PROB_MUTATION}, Elite Size: {ELITE_SIZE}')
+            all_exp_fits, all_run_sucs, all_run_fits= [], [], []
+            for i in range(NUMBER_OF_FILES):    
+                random.seed(seeds[i])
+                bests = evolution()
+                with open(f'log{i}.txt', 'w') as f:
+                    for b in bests:
+                        f.write(f'{b[1]}\t{SHAPE}\t{b[0]}\n')
+                # Collect fitness and success for plotting
+                fits = [b[1] for b in bests]
+                all_exp_fits.append(fits)
+                run_sucs, run_fits = [] ,[]
+                for t in range(NUM_TESTS):
+                    f, s = simulate(bests[-1][0])
+                    run_fits.append(f)
+                    if s:
+                        run_sucs.append(400)
+                    else:
+                        run_sucs.append(0)
+                all_run_sucs.append(run_sucs)
+                all_run_fits.append(run_fits)
+            generations = list(range(len(all_exp_fits[0])))
+            plot.figure(figsize=(10, 6))
+            for i in range(NUMBER_OF_FILES):
+                plot.plot(generations, all_exp_fits[i], linestyle='-', alpha=0.5, label=f'Run nº{i+1}')
+            plot.title(f'Evolution of Fitness (Exp {exp})')
+            plot.xlabel('Generation')
+            plot.ylabel('Fitness')
+            plot.legend(fontsize='small', ncol=2)
+            plot.grid(True)
+            plot.savefig(f'evolution_plot_exp{exp_idx+1}.png')
+            plot.close()
+            # Plot success and fitness for each run
+            plot.figure(figsize=(10, 6))
+            num_tests = list(range(NUM_TESTS))
+            for i in range(NUMBER_OF_FILES):
+                plot.plot(num_tests, all_run_fits[i], linestyle='-', alpha=0.5, label=f'Run nº{i+1} Fitness')
+                plot.plot(num_tests, all_run_sucs[i], marker='o', linestyle='', alpha=0.5, label=f'Run nº{i+1} Success({all_run_sucs[i].count(400)/NUM_TESTS*100:.2f}%)')
+            plot.title(f'Run Fitness and Success (Exp {exp})')
+            plot.xlabel('Num of tests')
+            plot.ylabel('Sucess/Fitness')
+            plot.legend(fontsize='small', ncol=2)
+            plot.grid(True)
+            plot.savefig(f'run_plot_exp{exp_idx+1}.png')
+            plot.close()
 
                 
-    # else:
-    # for log in range(NUMBER_OF_FILES):
-    #     #validate individual
-    #     log_str = str(log)
-    #     bests = load_bests('log'+ log_str +'.txt')
-    #     b = bests[-1]
-    #     SHAPE = b[1]
-    #     ind = b[2]
-            
-    #     ind = {'genotype': ind, 'fitness': None}
-            
-    #     ntests = 1000    
-    #     # ntests = 100
-
-    #     fit, success = 0, 0
-    #     all_fits, all_sucs = [], []
-    #     for i in range(1,ntests+1):
-    #         f, s = simulate(ind['genotype'], render_mode=render_mode, seed = None)
-    #         fit += f
-    #         all_fits.append(f)
-    #         success += s
-    #         all_sucs.append(s)
-
-    #     print(all_sucs.count(True))
-    #     plot_evolution(all_fits, all_sucs)
-    #     print(fit/ntests, success/ntests)
-    #     file_results[log] = (success/ntests)
-    # print(file_results)
-    
-    # log_str = str(log)
-    bests = load_bests('log'+ log_num +'.txt')
-    b = bests[-1]
-    SHAPE = b[1]
-    ind = b[2]
-        
-    ind = {'genotype': ind, 'fitness': None}
-        
-    ntests = 1000    
-    # ntests = 100
-
-    fit, success = 0, 0
-    all_fits, all_sucs = [], []
-    for i in range(1,ntests+1):
-        f, s = simulate(ind['genotype'], render_mode=render_mode, seed = None)
-        fit += f
-        all_fits.append(f)
-        success += s
-        all_sucs.append(s)
-
-    print(all_sucs.count(True))
-    plot_evolution(all_fits, all_sucs)
-    print(fit/ntests, success/ntests)
